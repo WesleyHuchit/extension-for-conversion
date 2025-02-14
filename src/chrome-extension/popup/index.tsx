@@ -18,11 +18,11 @@ interface Rows {
   workshop: string
 }
 
-interface Operation {
-  operations: Operation2[]
-}
+// interface Operation {
+//   operations: Operation2[]
+// }
 
-interface Operation2 {
+interface Operation {
   name: string
   time: string
 }
@@ -30,6 +30,7 @@ interface Operation2 {
 export const Popup = () => {
 
   const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
+  const [data, setData] = useState<DataType | null>(null);
 
   useEffect(() => {
     if (chrome.tabs) {
@@ -56,7 +57,7 @@ export const Popup = () => {
             }
 
 
-            const data: Rows[] = [];
+            const rows: Rows[] = [];
 
             const trElements = document.querySelectorAll('tr.type-impact:not(.type-resume)');
 
@@ -84,7 +85,7 @@ export const Popup = () => {
                   const opTimeReportArray = Array.from(opTimeReport).map(opTime => opTime instanceof HTMLElement ? opTime.innerText : '');
 
 
-                  const operationsT: Operation2[] = []
+                  const operationsT: Operation[] = []
 
                   operationsArray.forEach((operation, index) => {
                     operationsT.push({
@@ -93,15 +94,16 @@ export const Popup = () => {
                     })
                   })
 
-                  row.operations.push({
-                    operations: operationsT
-                  })
+                  row.operations.push(
+                    ...operationsT
+                  )
                 }
               })
 
-              data.push(row);
-
+              rows.push(row);
             })
+
+            // console.log('rows', rows)
 
             const elements = document.querySelectorAll("*:not(script):not(style)");
 
@@ -125,7 +127,7 @@ export const Popup = () => {
 
             const dataObject: DataType = {
               plate: foundPlates[0],
-              rows: data
+              rows: rows
             }
 
             console.log(dataObject)
@@ -143,17 +145,57 @@ export const Popup = () => {
   function downloadExcel() {
     chrome.storage.local.get(['extractedData'], (result) => {
       const data = result.extractedData as DataType;
+      setData(data);
+  
+      const formattedRows = data.rows.map(row => {
+        const operationsObj: Record<string, string> = {};
+  
+        row.operations.forEach((op, index) => {
+          operationsObj[`Operation ${index + 1} Name`] = op.name;
+          operationsObj[`Operation ${index + 1} Time`] = op.time;
+        });
+  
+        const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
+        const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
 
-      const ws = XLSX.utils.json_to_sheet(data.rows);
+        // var notCalc = false
+        var priceDifference = 0
+
+        if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
+          // notCalc = true
+        } else {
+          priceDifference = priceFormatted - finalPriceFormatted
+        }
+
+        return {
+          ...operationsObj,
+          quantity: row.quantity,
+          code: row.code,
+          description: row.description,
+          workshop: row.workshop,
+          price: row.price,
+          discount: row.discount,
+          finalPrice: row.finalPrice,
+          priceDifference: priceDifference,
+        };
+
+      });
+  
+      const ws = XLSX.utils.json_to_sheet(formattedRows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
       XLSX.writeFile(wb, 'data.xlsx');
     });
   }
+   
+  console.log(data)
+  
 
   return (
-    <div className="text-5xl p-10 font-extrabold">
-      <button onClick={() => downloadExcel()} >Excel</button>      
+    <div className="">
+      <div className="flex wrap gap-4">
+        <button onClick={() => downloadExcel()} >Excel 5</button>
+      </div>
     </div>
   );
 };
