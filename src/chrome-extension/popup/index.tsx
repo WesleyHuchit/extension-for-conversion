@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../global.css";
+import { Button } from "../../components/ui/button";
 
 interface DataType {
   plate: string
@@ -194,7 +195,7 @@ export const Popup = () => {
   return (
     <div className="">
       <div className="flex wrap gap-4">
-        <button onClick={() => downloadExcel()} >Excel 5</button>
+        <Button onClick={() => downloadExcel()} >Excel 5</Button>
       </div>
     </div>
   );
