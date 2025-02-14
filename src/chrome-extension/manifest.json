@@ -13,5 +13,10 @@
     "48": "public/48.png",
     "192": "public/192.png"
   },
-  "permissions": ["storage", "tabs", "scripting"]
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ]
 }
