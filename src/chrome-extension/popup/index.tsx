@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../global.css";
 import { Button } from "../../components/ui/button";
+import { Card } from "./components/card/card";
 
 interface DataType {
   plate: string
@@ -47,7 +48,10 @@ export const Popup = () => {
 
       if (tab) {
         chrome.scripting.executeScript({
-          target: { tabId: tab.id! },
+          target: { 
+            tabId: tab.id!,
+            
+          },
           func: () => {
 
 
@@ -56,7 +60,6 @@ export const Popup = () => {
               const mercosulPattern = /^[A-Z]{3}\d[A-Z]\d{2}$/;
               return oldPattern.test(plate) || mercosulPattern.test(plate) ? plate : false;
             }
-
 
             const rows: Rows[] = [];
 
@@ -131,7 +134,7 @@ export const Popup = () => {
               rows: rows
             }
 
-            console.log(dataObject)
+            // console.log(dataObject)
 
             chrome.storage.local.set({ extractedData: dataObject }, () => {
               console.log("Data saved!");
@@ -147,15 +150,15 @@ export const Popup = () => {
     chrome.storage.local.get(['extractedData'], (result) => {
       const data = result.extractedData as DataType;
       setData(data);
-  
+
       const formattedRows = data.rows.map(row => {
         const operationsObj: Record<string, string> = {};
-  
+
         row.operations.forEach((op, index) => {
           operationsObj[`Operation ${index + 1} Name`] = op.name;
           operationsObj[`Operation ${index + 1} Time`] = op.time;
         });
-  
+
         const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
         const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
 
@@ -181,21 +184,68 @@ export const Popup = () => {
         };
 
       });
-  
+
       const ws = XLSX.utils.json_to_sheet(formattedRows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
       XLSX.writeFile(wb, 'data.xlsx');
     });
   }
-   
-  console.log(data)
-  
+
+  const [averagePricePerHour, setAveragePricePerHour] = useState(0);
+
+  useEffect(() => {
+    chrome.storage.local.get(['extractedData'], (result) => {
+      const data = result.extractedData as DataType;
+      setData(data);
+
+      const formattedRows = data.rows.map(row => {
+        const operationsObj: Record<string, string> = {};
+
+        row.operations.forEach((op, index) => {
+          operationsObj[`Operation ${index + 1} Name`] = op.name;
+          operationsObj[`Operation ${index + 1} Time`] = op.time;
+        });
+
+        const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
+        const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
+
+        // var notCalc = false
+        var priceDifference = 0
+
+        if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
+          // notCalc = true
+        } else {
+          priceDifference = priceFormatted - finalPriceFormatted
+        }
+
+        return {
+          ...operationsObj,
+          quantity: row.quantity,
+          code: row.code,
+          description: row.description,
+          workshop: row.workshop,
+          price: row.price,
+          discount: row.discount,
+          finalPrice: row.finalPrice,
+          priceDifference: priceDifference,
+        };
+
+      });
+
+      const ws = XLSX.utils.json_to_sheet(formattedRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, 'data.xlsx');
+    });
+  }, [data])
+
 
   return (
     <div className="">
+      <Card title="Média de Preço por Hora" information={averagePricePerHour} />
       <div className="flex wrap gap-4">
-        <Button onClick={() => downloadExcel()} >Excel 5</Button>
+        <Button onClick={() => downloadExcel()} >Baixar a Planilha</Button>
       </div>
     </div>
   );
