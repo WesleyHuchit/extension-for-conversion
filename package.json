@@ -12,6 +12,7 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
     "@types/node": "^22.5.5",
+    "caniuse-lite": "^1.0.30001748",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",

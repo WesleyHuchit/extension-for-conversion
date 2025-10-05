@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension Starter",
+  "name": "Fenix",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html"
@@ -17,6 +17,11 @@
     "activeTab",
     "scripting",
     "storage",
-    "tabs"
-  ]
+    "tabs",
+    "nativeMessaging"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["<all_urls>"]
 }

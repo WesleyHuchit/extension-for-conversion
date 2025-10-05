@@ -1,38 +1,16 @@
 import { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
 import "../global.css";
 import { Button } from "../../components/ui/button";
-import { Card } from "./components/card/card";
+import { DataType } from "../../dtos/DataType";
+import { Rows } from "../../dtos/Rows";
+import { Operation } from "../../dtos/Operation";
+import { useDownload } from "../hooks/useDownload";
 
-interface DataType {
-  plate: string
-  rows: Rows[]
-}
 
-interface Rows {
-  code: string
-  description: string
-  discount: string
-  finalPrice: string
-  operations: Operation[]
-  price: string
-  quantity: string
-  workshop: string
-}
-
-// interface Operation {
-//   operations: Operation2[]
-// }
-
-interface Operation {
-  name: string
-  time: string
-}
-
-export const Popup = () => {
+export function Popup() {
 
   const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
-  const [data, setData] = useState<DataType | null>(null);
+  const { setData } = useDownload();
 
   useEffect(() => {
     if (chrome.tabs) {
@@ -43,209 +21,236 @@ export const Popup = () => {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    // (async () => {
+    //   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-      if (tab) {
-        chrome.scripting.executeScript({
-          target: { 
-            tabId: tab.id!,
-            
-          },
-          func: () => {
+    //   if (!tab) return;
 
+    //   chrome.scripting.executeScript({
+    //     target: {
+    //       tabId: tab.id!
+    //     },
+    //     func: () => {
 
-            function validateBrazilianLicensePlate(plate: string) {
-              const oldPattern = /^[A-Z]{3}-\d{4}$/;
-              const mercosulPattern = /^[A-Z]{3}\d[A-Z]\d{2}$/;
-              return oldPattern.test(plate) || mercosulPattern.test(plate) ? plate : false;
-            }
+    //       const rows: Rows[] = [];
 
-            const rows: Rows[] = [];
+    //       const trElements = document.querySelectorAll('tr.type-impact:not(.type-resume)');
 
-            const trElements = document.querySelectorAll('tr.type-impact:not(.type-resume)');
+    //       trElements.forEach(tr => {
+    //         const tdElements = tr.querySelectorAll('td');
 
-            trElements.forEach(tr => {
-              const tdElements = tr.querySelectorAll('td');
+    //         const row: Rows = {
+    //           operations: [],
+    //           quantity: tdElements[1].innerText,
+    //           code: tdElements[2].innerText,
+    //           description: tdElements[3].innerText,
+    //           workshop: tdElements[4].innerText,
+    //           price: tdElements[5].innerText,
+    //           discount: tdElements[6].innerText,
+    //           finalPrice: tdElements[7].innerText
+    //         };
 
-              const row: Rows = {
-                operations: [],
-                quantity: tdElements[1].innerText,
-                code: tdElements[2].innerText,
-                description: tdElements[3].innerText,
-                workshop: tdElements[4].innerText,
-                price: tdElements[5].innerText,
-                discount: tdElements[6].innerText,
-                finalPrice: tdElements[7].innerText
-              };
+    //         tdElements.forEach((td, index) => {
 
-              tdElements.forEach((td, index) => {
+    //           if (index === 0) {
+    //             const operations = td.querySelectorAll('span.button_circle_op_report')
+    //             const operationsArray = Array.from(operations).map(operation => operation instanceof HTMLElement ? operation.innerText : '');
 
-                if (index === 0) {
-                  const operations = td.querySelectorAll('span.button_circle_op_report')
-                  const operationsArray = Array.from(operations).map(operation => operation instanceof HTMLElement ? operation.innerText : '');
-
-                  const opTimeReport = td.querySelectorAll('span.op_time_report');
-                  const opTimeReportArray = Array.from(opTimeReport).map(opTime => opTime instanceof HTMLElement ? opTime.innerText : '');
+    //             const opTimeReport = td.querySelectorAll('span.op_time_report');
+    //             const opTimeReportArray = Array.from(opTimeReport).map(opTime => opTime instanceof HTMLElement ? opTime.innerText : '');
 
 
-                  const operationsT: Operation[] = []
+    //             const operationsT: Operation[] = []
 
-                  operationsArray.forEach((operation, index) => {
-                    operationsT.push({
-                      name: operation,
-                      time: opTimeReportArray[index]
-                    })
-                  })
+    //             operationsArray.forEach((operation, index) => {
+    //               operationsT.push({
+    //                 name: operation,
+    //                 time: opTimeReportArray[index]
+    //               })
+    //             })
 
-                  row.operations.push(
-                    ...operationsT
-                  )
-                }
-              })
+    //             row.operations.push(
+    //               ...operationsT
+    //             )
+    //           }
+    //         })
 
-              rows.push(row);
-            })
+    //         rows.push(row);
+    //       })
 
-            // console.log('rows', rows)
+    //       // console.log('rows', rows)
 
-            const elements = document.querySelectorAll("*:not(script):not(style)");
+    //       const elements = document.querySelectorAll("*:not(script):not(style)");
 
-            let foundPlates: string[] = [];
+    //       let foundPlates: string[] = [];
 
-            elements.forEach(element => {
-              if (element.childNodes.length) {
-                element.childNodes.forEach(node => {
-                  if (node.nodeType === Node.TEXT_NODE) {
-                    const plate = validateBrazilianLicensePlate(node.textContent || '');
-                    if (plate) {
-                      foundPlates.push(plate);
-                      return
-                    }
-                    return
-                  }
-                  return
-                });
-              }
-            });
+    //       elements.forEach(element => {
+    //         if (element.childNodes.length) {
+    //           element.childNodes.forEach(node => {
+    //             if (node.nodeType === Node.TEXT_NODE) {
+    //               const plate = validateBrazilianLicensePlate(node.textContent || '');
+    //               if (plate) {
+    //                 foundPlates.push(plate);
+    //                 return
+    //               }
+    //               return
+    //             }
+    //             return
+    //           });
+    //         }
+    //       });
 
-            const dataObject: DataType = {
-              plate: foundPlates[0],
-              rows: rows
-            }
+    //       const dataObject: DataType = {
+    //         plate: foundPlates[0],
+    //         rows: rows
+    //       }
 
-            // console.log(dataObject)
+    //       // console.log('dataObject', dataObject);
+    //       chrome.runtime.sendMessage({ action: 'extractedData', data: dataObject });
+    //       // setData(dataObject);
 
-            chrome.storage.local.set({ extractedData: dataObject }, () => {
-              console.log("Data saved!");
-            });
 
-          },
-        });
-      }
-    })()
+    //       // chrome.storage.local.set({ extractedData: dataObject }, () => {
+    //       //   console.log("Data saved!");
+    //       // });
+
+    //     },
+    //   });
+
+    // })()
+    // console.log("Tabs:", tabs);
+    setTabs(tabs);
   }, [tabs]);
 
-  function downloadExcel() {
-    chrome.storage.local.get(['extractedData'], (result) => {
-      const data = result.extractedData as DataType;
-      setData(data);
+  async function test() {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-      const formattedRows = data.rows.map(row => {
-        const operationsObj: Record<string, string> = {};
+    if (!tab) return;
 
-        row.operations.forEach((op, index) => {
-          operationsObj[`Operation ${index + 1} Name`] = op.name;
-          operationsObj[`Operation ${index + 1} Time`] = op.time;
-        });
+    console.log('tab', tab)
 
-        const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
-        const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
 
-        // var notCalc = false
-        var priceDifference = 0
+    chrome.scripting.executeScript({
+      target: {
+        tabId: tab.id!
+      },
+      func: () => {
 
-        if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
-          // notCalc = true
-        } else {
-          priceDifference = priceFormatted - finalPriceFormatted
+        function validateBrazilianLicensePlate(plate: string) {
+          const oldPattern = /^[A-Z]{3}-\d{4}$/;
+          const mercosulPattern = /^[A-Z]{3}\d[A-Z]\d{2}$/;
+          return oldPattern.test(plate) || mercosulPattern.test(plate) ? plate : false;
         }
 
-        return {
-          ...operationsObj,
-          quantity: row.quantity,
-          code: row.code,
-          description: row.description,
-          workshop: row.workshop,
-          price: row.price,
-          discount: row.discount,
-          finalPrice: row.finalPrice,
-          priceDifference: priceDifference,
-        };
+        // alert('Script Executed!');
+        const rows: Rows[] = [];
 
-      });
+        const trElements = document.querySelectorAll('tr.type-impact:not(.type-resume)');
 
-      const ws = XLSX.utils.json_to_sheet(formattedRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      XLSX.writeFile(wb, 'data.xlsx');
+        trElements.forEach(tr => {
+          const tdElements = tr.querySelectorAll('td');
+
+          const row: Rows = {
+            operations: [],
+            quantity: tdElements[1].innerText,
+            code: tdElements[2].innerText,
+            description: tdElements[3].innerText,
+            workshop: tdElements[4].innerText,
+            price: tdElements[5].innerText,
+            discount: tdElements[6].innerText,
+            finalPrice: tdElements[7].innerText
+          };
+
+          tdElements.forEach((td, index) => {
+
+            if (index === 0) {
+              const operations = td.querySelectorAll('span.button_circle_op_report')
+              const operationsArray = Array.from(operations).map(operation => operation instanceof HTMLElement ? operation.innerText : '');
+
+              const opTimeReport = td.querySelectorAll('span.op_time_report');
+              const opTimeReportArray = Array.from(opTimeReport).map(opTime => opTime instanceof HTMLElement ? opTime.innerText : '');
+
+
+              const operationsT: Operation[] = []
+
+              operationsArray.forEach((operation, index) => {
+                operationsT.push({
+                  name: operation,
+                  time: opTimeReportArray[index]
+                })
+              })
+
+              row.operations.push(
+                ...operationsT
+              )
+            }
+          })
+
+          rows.push(row);
+        })
+
+        // console.log('rows', rows)
+
+        const elements = document.querySelectorAll("*:not(script):not(style)");
+
+        let foundPlates: string[] = [];
+
+        elements.forEach(element => {
+          if (element.childNodes.length) {
+            element.childNodes.forEach(node => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                const plate = validateBrazilianLicensePlate(node.textContent || '');
+                if (plate) {
+                  foundPlates.push(plate);
+                  return
+                }
+                return
+              }
+              return
+            });
+          }
+        });
+
+        const dataObject: DataType = {
+          plate: foundPlates[0],
+          rows: rows
+        }
+
+        chrome.runtime.sendMessage({ action: 'extractedData', data: dataObject });
+        // setData(dataObject);
+
+
+        // chrome.storage.local.set({ extractedData: dataObject }, () => {
+        //   console.log("Data saved!");
+        // });
+
+      }
+    }).then(() => {
+      console.log('Script executed successfully');
+    }).catch(err => {
+      console.error('Error executing script:', err);
     });
   }
 
-  const [averagePricePerHour, setAveragePricePerHour] = useState(0);
-
   useEffect(() => {
-    chrome.storage.local.get(['extractedData'], (result) => {
-      const data = result.extractedData as DataType;
-      setData(data);
+    const listener = (message: any) => {
+      if (message.action === 'extractedData') {
+        setData(message.data);
+      }
+    };
 
-      const formattedRows = data.rows.map(row => {
-        const operationsObj: Record<string, string> = {};
+    chrome.runtime.onMessage.addListener(listener);
 
-        row.operations.forEach((op, index) => {
-          operationsObj[`Operation ${index + 1} Name`] = op.name;
-          operationsObj[`Operation ${index + 1} Time`] = op.time;
-        });
-
-        const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
-        const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
-
-        // var notCalc = false
-        var priceDifference = 0
-
-        if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
-          // notCalc = true
-        } else {
-          priceDifference = priceFormatted - finalPriceFormatted
-        }
-
-        return {
-          ...operationsObj,
-          quantity: row.quantity,
-          code: row.code,
-          description: row.description,
-          workshop: row.workshop,
-          price: row.price,
-          discount: row.discount,
-          finalPrice: row.finalPrice,
-          priceDifference: priceDifference,
-        };
-
-      });
-
-      const ws = XLSX.utils.json_to_sheet(formattedRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      XLSX.writeFile(wb, 'data.xlsx');
-    });
-  }, [data])
+    return () => {
+      chrome.runtime.onMessage.removeListener(listener);
+    };
+  }, []);
 
 
   return (
     <div className="">
-      <Card title="Média de Preço por Hora" information={averagePricePerHour} />
-      <div className="flex wrap gap-4">
-        <Button onClick={() => downloadExcel()} >Baixar a Planilha</Button>
+      <div className="flex gap-4">
+        <Button onClick={() => test()} >Baixar a Planilha</Button>
       </div>
     </div>
   );
