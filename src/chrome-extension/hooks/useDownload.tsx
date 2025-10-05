@@ -1,58 +1,54 @@
-import { useState } from "react";
 import { DataType } from "../../dtos/DataType";
 // import * as XLSX from "xlsx";
 
 export function useDownload() {
 
-    const [data, setData] = useState<DataType | null>(null);
+    // const [data, setData] = useState<DataType | null>(null);
 
-    function downloadExcel() {
-        // chrome.storage.local.get(['extractedData'], (result) => {
-        //     const data = result.extractedData as DataType;
-        //     setData(data);
+    function downloadExcel(data: DataType) {
 
-        //     const formattedRows = data.rows.map(row => {
-        //         const operationsObj: Record<string, string> = {};
+        console.log('Downloading Excel with data:', data);
 
-        //         row.operations.forEach((op, index) => {
-        //             operationsObj[`Operation ${index + 1} Name`] = op.name;
-        //             operationsObj[`Operation ${index + 1} Time`] = op.time;
-        //         });
+        // const formattedRows = data.rows.map(row => {
+        //     const operationsObj: Record<string, string> = {};
 
-        //         const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
-        //         const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
-
-        //         // var notCalc = false
-        //         var priceDifference = 0
-
-        //         if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
-        //             // notCalc = true
-        //         } else {
-        //             priceDifference = priceFormatted - finalPriceFormatted
-        //         }
-
-        //         return {
-        //             ...operationsObj,
-        //             quantity: row.quantity,
-        //             code: row.code,
-        //             description: row.description,
-        //             workshop: row.workshop,
-        //             price: row.price,
-        //             discount: row.discount,
-        //             finalPrice: row.finalPrice,
-        //             priceDifference: priceDifference,
-        //         };
-
+        //     row.operations.forEach((op, index) => {
+        //         operationsObj[`Operation ${index + 1} Name`] = op.name;
+        //         operationsObj[`Operation ${index + 1} Time`] = op.time;
         //     });
 
-        //     const ws = XLSX.utils.json_to_sheet(formattedRows);
-        //     const wb = XLSX.utils.book_new();
-        //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        //     XLSX.writeFile(wb, 'data.xlsx');
+        //     const priceFormatted = parseFloat(row.price.replace(/[^0-9,]/g, ""))
+        //     const finalPriceFormatted = parseFloat(row.finalPrice.replace(/[^0-9,]/g, ""));
+
+        //     // var notCalc = false
+        //     var priceDifference = 0
+
+        //     if (isNaN(priceFormatted) || isNaN(finalPriceFormatted)) {
+        //         // notCalc = true
+        //     } else {
+        //         priceDifference = priceFormatted - finalPriceFormatted
+        //     }
+
+        //     return {
+        //         ...operationsObj,
+        //         quantity: row.quantity,
+        //         code: row.code,
+        //         description: row.description,
+        //         workshop: row.workshop,
+        //         price: row.price,
+        //         discount: row.discount,
+        //         finalPrice: row.finalPrice,
+        //         priceDifference: priceDifference,
+        //     };
+
         // });
 
-        // console.log("Download function called");
-        console.log("Data to be downloaded:", data);
+        // const ws = XLSX.utils.json_to_sheet(formattedRows);
+        // const wb = XLSX.utils.book_new();
+        // XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        // XLSX.writeFile(wb, 'data.xlsx');
+
+        // console.log('Downloading Excel with data:', data);
 
     }
 
@@ -103,9 +99,7 @@ export function useDownload() {
     // }, [data])
 
     return {
-        downloadExcel,
-        data,
-        setData
+        downloadExcel
     }
 
 }

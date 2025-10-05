@@ -10,7 +10,7 @@ import { useDownload } from "../hooks/useDownload";
 export function Popup() {
 
   const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
-  const { setData } = useDownload();
+  const { downloadExcel } = useDownload();
 
   useEffect(() => {
     if (chrome.tabs) {
@@ -127,9 +127,6 @@ export function Popup() {
 
     if (!tab) return;
 
-    console.log('tab', tab)
-
-
     chrome.scripting.executeScript({
       target: {
         tabId: tab.id!
@@ -235,7 +232,8 @@ export function Popup() {
   useEffect(() => {
     const listener = (message: any) => {
       if (message.action === 'extractedData') {
-        setData(message.data);
+        const data = (message.data);
+        downloadExcel(data);
       }
     };
 
