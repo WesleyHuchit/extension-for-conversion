@@ -6,7 +6,6 @@ import { Rows } from "../../dtos/Rows";
 import { Operation } from "../../dtos/Operation";
 import { useDownload } from "../hooks/useDownload";
 
-
 export function Popup() {
 
   const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
@@ -244,11 +243,39 @@ export function Popup() {
     };
   }, []);
 
+    const handleDownload = async () => {
+      const response = await fetch("http://localhost:3333/extension/service-order", {
+        method: "POST",
+      });
+
+      console.log('response', response);
+
+      if (!response.ok) throw new Error("Erro ao gerar PDF");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ordem_servico.pdf"; // nome do arquivo
+      a.click();
+
+      // Limpa o objeto após o download
+      window.URL.revokeObjectURL(url);
+    };
+
 
   return (
     <div className="">
-      <div className="flex gap-4">
-        <Button onClick={() => test()} >Baixar a Planilha</Button>
+      <div className="flex flex-col gap-2 p-2">
+        <Button onClick={() => test()}>
+          Baixar a Planilha
+        </Button>
+        <Button
+          onClick={() => handleDownload()}
+        >
+          Test 2
+        </Button>
       </div>
     </div>
   );
