@@ -97,25 +97,13 @@ export function Popup() {
         if (matches) {
           foundPlates.push(...matches);
         }
-        //   if (element.childNodes.length) {
-        //     element.childNodes.forEach(node => {
-        //       if (node.nodeType === Node.TEXT_NODE) {
-        //         const plate = validateBrazilianLicensePlate(node.textContent || '');
-        //         if (plate) {
-        //           foundPlates.push(plate);
-        //           return
-        //         }
-        //         return
-        //       }
-        //       return
-        //     });
-        //   }
-        // });
 
         const dataObject: DataType = {
           plate: foundPlates[0],
           rows: rows
         }
+
+        console.log('Extracted Data:', dataObject);
 
         chrome.runtime.sendMessage({ action: 'extractedData', data: dataObject });
 

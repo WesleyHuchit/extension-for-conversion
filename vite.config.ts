@@ -33,7 +33,6 @@ export default defineConfig({
         popup: resolve(__dirname, "popup.html"),
         options: resolve(__dirname, "options.html"),
         background: resolve(__dirname, 'src/chrome-extension/background.ts'),
-        // validateBrazilianLicensePlate: resolve(__dirname, 'src/utils/validateBrazilianLicensePlate.ts'),
       },
       output: {
         entryFileNames: "[name].js",
