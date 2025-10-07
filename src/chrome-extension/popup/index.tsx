@@ -39,13 +39,8 @@ export function Popup() {
       },
       func: () => {
 
-        function validateBrazilianLicensePlate(plate: string) {
-          const oldPattern = /^[A-Z]{3}-\d{4}$/;
-          const mercosulPattern = /^[A-Z]{3}\d[A-Z]\d{2}$/;
-          return oldPattern.test(plate) || mercosulPattern.test(plate) ? plate : false;
-        }
+        const plateRegex = /[A-Z]{3}-?\d{1}[a-zA-Z0-9]{1}\d{2}/gi;
 
-        // alert('Script Executed!');
         const rows: Rows[] = [];
 
         const trElements = document.querySelectorAll('tr.type-impact:not(.type-resume)');
@@ -92,27 +87,30 @@ export function Popup() {
           rows.push(row);
         })
 
-        // console.log('rows', rows)
-
-        const elements = document.querySelectorAll("*:not(script):not(style)");
 
         let foundPlates: string[] = [];
 
-        elements.forEach(element => {
-          if (element.childNodes.length) {
-            element.childNodes.forEach(node => {
-              if (node.nodeType === Node.TEXT_NODE) {
-                const plate = validateBrazilianLicensePlate(node.textContent || '');
-                if (plate) {
-                  foundPlates.push(plate);
-                  return
-                }
-                return
-              }
-              return
-            });
-          }
-        });
+        const texto = document.body.innerText;
+        const matches = texto.match(plateRegex);
+
+
+        if (matches) {
+          foundPlates.push(...matches);
+        }
+        //   if (element.childNodes.length) {
+        //     element.childNodes.forEach(node => {
+        //       if (node.nodeType === Node.TEXT_NODE) {
+        //         const plate = validateBrazilianLicensePlate(node.textContent || '');
+        //         if (plate) {
+        //           foundPlates.push(plate);
+        //           return
+        //         }
+        //         return
+        //       }
+        //       return
+        //     });
+        //   }
+        // });
 
         const dataObject: DataType = {
           plate: foundPlates[0],
@@ -120,8 +118,6 @@ export function Popup() {
         }
 
         chrome.runtime.sendMessage({ action: 'extractedData', data: dataObject });
-        // setData(dataObject);
-
 
         // chrome.storage.local.set({ extractedData: dataObject }, () => {
         //   console.log("Data saved!");

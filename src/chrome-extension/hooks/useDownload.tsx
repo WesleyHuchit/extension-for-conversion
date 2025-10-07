@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DataType } from "../../dtos/DataType";
 import axios from "axios";
-// import * as XLSX from "xlsx";
+
 
 export function useDownload() {
 
@@ -9,6 +9,7 @@ export function useDownload() {
 
   async function handleDownload() {
     console.log('data before downloadExcel', data);
+    
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/extension/service-order`, data, {
         responseType: "blob",
