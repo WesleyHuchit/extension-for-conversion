@@ -21,6 +21,10 @@ export default defineConfig({
         { src: "src/chrome-extension/public/32.png", dest: "./public" },
         { src: "src/chrome-extension/public/48.png", dest: "./public" },
         { src: "src/chrome-extension/public/192.png", dest: "./public" },
+        {
+          src: "src/chrome-extension/global.css",
+          dest: "./",
+        }
       ],
     }),
   ],
@@ -33,7 +37,7 @@ export default defineConfig({
         popup: resolve(__dirname, "popup.html"),
         options: resolve(__dirname, "options.html"),
         background: resolve(__dirname, 'src/chrome-extension/background.ts'),
-        contentScript: resolve(__dirname, 'src/chrome-extension/contentScript.js')
+        contentScript: resolve(__dirname, 'src/chrome-extension/contentScript.js'),
       },
       output: {
         entryFileNames: "[name].js",

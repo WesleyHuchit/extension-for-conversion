@@ -110,12 +110,6 @@ export function Popup() {
         //   console.log("Data saved!");
         // });
 
-        const nav = document.querySelector('nav');
-
-        if (nav) {
-          nav.style.backgroundColor = 'red';
-        }
-
       }
     }).then(() => {
       console.log('Script executed successfully');
@@ -131,7 +125,6 @@ export function Popup() {
         const data = (message.data);
         console.log('Received data in popup:', data);
         setData(data);
-        // downloadExcel(data);
       }
     };
 
