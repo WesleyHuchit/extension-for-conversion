@@ -3,3 +3,5 @@ chrome.runtime.onMessage.addListener((message) => {
         chrome.runtime.sendMessage({ action: 'extractedData', data: message.data });
     }
 });
+
+

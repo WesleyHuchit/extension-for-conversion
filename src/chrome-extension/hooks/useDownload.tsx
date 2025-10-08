@@ -19,10 +19,9 @@ export function useDownload() {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "ordem_servico.pdf"; // nome do arquivo
+      a.download = "ordem_servico.pdf";
       a.click();
 
-      // Limpa o objeto após o download
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Erro ao gerar PDF", error);

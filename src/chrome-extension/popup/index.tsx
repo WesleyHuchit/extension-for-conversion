@@ -87,7 +87,6 @@ export function Popup() {
           rows.push(row);
         })
 
-
         let foundPlates: string[] = [];
 
         const texto = document.body.innerText;
@@ -111,6 +110,12 @@ export function Popup() {
         //   console.log("Data saved!");
         // });
 
+        const nav = document.querySelector('nav');
+
+        if (nav) {
+          nav.style.backgroundColor = 'red';
+        }
+
       }
     }).then(() => {
       console.log('Script executed successfully');
@@ -118,6 +123,7 @@ export function Popup() {
       console.error('Error executing script:', err);
     });
   }
+
 
   useEffect(() => {
     const listener = (message: any) => {
