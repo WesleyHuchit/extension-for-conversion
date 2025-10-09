@@ -38,9 +38,10 @@ export default defineConfig({
         options: resolve(__dirname, "options.html"),
         background: resolve(__dirname, 'src/chrome-extension/background.ts'),
         contentScript: resolve(__dirname, 'src/chrome-extension/contentScript.js'),
+        findParts: resolve(__dirname, 'src/chrome-extension/findParts.js'),
       },
       output: {
-        entryFileNames: "[name].js",
+        entryFileNames: "[name].js"
       },
     },
   },
